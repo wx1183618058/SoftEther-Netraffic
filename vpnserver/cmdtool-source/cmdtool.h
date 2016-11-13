@@ -3,7 +3,7 @@
 #define dir2 "/vpnserver/config" //最终配置文件
 #define dir3 "/vpnserver/count"  //用户总流量文件
 #define dir4 "/home/wwwroot/default/console/config" //JY流控web显示用户信息文件
-//#define BLG
+#define BLG
 //#define JY
 
 

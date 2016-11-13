@@ -173,12 +173,14 @@ void file(user *u) {
 	user *x;
 	char buf[50];
 	x=u;
+	#ifdef JY
 	fp=fopen(dir2,"w");
 	fp2=fopen(dir4,"w");
+	#endif
 	while(x!=NULL) {
 		//BLG流控
 		#ifdef BLG
-		sprintf(buf, "./cmd/update.sh %s %ld %ld %d", x->name, x->SendBroad+x->SendUni, x->RecvUni+x->RecvBroad, x->online);
+		sprintf(buf, "/vpnserver/cmd/update.sh %s %ld %ld %d", x->name, x->SendBroad+x->SendUni, x->RecvUni+x->RecvBroad, x->online);
 		system(buf);
 		#endif
 		//JY流控
@@ -188,8 +190,10 @@ void file(user *u) {
 		#endif
 		x=x->next;
 	}
+	#ifdef JY
 	fclose(fp2);
 	fclose(fp);
+	#endif
 }
 
 uint64_t cton(char *num) {
@@ -234,12 +238,12 @@ void  monitor(user *u) {
 		m=x->Count;
 		n=x->Count2;
 		if(m>n&&x->access==1) {
-			sprintf(buf, "./cmd/Access.sh %s %s", x->name, "no");
+			sprintf(buf, "/vpnserver/cmd/Access.sh %s %s", x->name, "no");
 			system(buf);
 			x->access=0;
 		}
 		if(m<n&&x->access==0) {
-			sprintf(buf, "./cmd/Access.sh %s %s", x->name, "yes");
+			sprintf(buf, "/vpnserver/cmd/Access.sh %s %s", x->name, "yes");
 			system(buf);
 			x->access=1;
 		}
