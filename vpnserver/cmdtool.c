@@ -185,7 +185,7 @@ void file(user *u) {
 	x=u;
 	while(x!=NULL) {
 		if(x->onl!=NULL) {
-			sprintf(buf, "/vpnserver/cmd/update.sh %s %ld %ld %d %ld %ld %s", x->name, x->SendBroad+x->SendUni, x->RecvUni+x->RecvBroad, x->online, x->onl->Outgoing, x->onl->Incoming, x->onl->Mode);
+			sprintf(buf, "/vpnserver/cmd/update.sh %s %ld %ld %d %ld %ld %s %s", x->name, x->SendBroad+x->SendUni, x->RecvUni+x->RecvBroad, x->online, x->onl->Outgoing, x->onl->Incoming, x->onl->Mode, x->onl->Session);
 			system(buf);
 		} else {
 			sprintf(buf, "/vpnserver/cmd/update2.sh %s %ld %ld %d", x->name, x->SendBroad+x->SendUni, x->RecvUni+x->RecvBroad, x->online);
@@ -229,6 +229,8 @@ void  monitor(user *u) {
 		n=x->Count2;
 		if(m>n&&x->access==1) {
 			sprintf(buf, "/vpnserver/cmd/Access.sh %s %s", x->name, "no");
+			system(buf);
+			sprintf(buf, "/vpnserver/cmd/SessionDisconnect.sh %s", x->onl->Session);
 			system(buf);
 			x->access=0;
 		}
