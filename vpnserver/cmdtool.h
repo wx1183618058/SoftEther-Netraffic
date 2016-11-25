@@ -23,7 +23,7 @@ typedef struct u {
 	int access;
 	int down;
 	int upload;
-	int logins;
+	int logins; //用户登录数
 	uint64_t SendBroad;
 	uint64_t SendUni;
 	uint64_t RecvBroad;
@@ -31,7 +31,7 @@ typedef struct u {
 	uint64_t Count3;  //已使用流量
 	int Count;   //已使用流量int形式
 	int Count2;  //限制流量
-	int online;
+	int online;	 //用户在线数量
 	
 	ol *onl;
 	
@@ -61,8 +61,8 @@ void  monitor(user *);
 //释放数据库
 void freelist(user *);
 
-//判断是否在线
-void oli(user *);
+//提出多于用户
+void oli(user *,  ol *);
 
 //判断是否有注册用户
 int zero();

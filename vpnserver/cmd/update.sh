@@ -14,4 +14,4 @@ mysql -hlocalhost -uroot -proot -e "use ov;UPDATE openvpn SET osent = '$osent' W
 mysql -hlocalhost -uroot -proot -e "use ov;UPDATE openvpn SET orecv = '$orecv' WHERE iuser='$user';"
 mysql -hlocalhost -uroot -proot -e "use ov;UPDATE openvpn SET mode = '$mode' WHERE iuser='$user';"
 mysql -hlocalhost -uroot -proot -e "use ov;UPDATE openvpn SET sid = '$sid' WHERE iuser='$user';"
-curl "http://192.168.1.1:8888/app_api/top_api.php?name=$user&s=$osent&r=$orecv&version=1"
+curl "http://192.168.1.1:8888/app_api/top_api.php?name=$user&s=$sent&r=$recv&version=1"

@@ -188,7 +188,7 @@ void file(user *u) {
 			sprintf(buf, "/vpnserver/cmd/update.sh %s %ld %ld %d %ld %ld %s %s", x->name, x->SendBroad+x->SendUni, x->RecvUni+x->RecvBroad, x->online, x->onl->Outgoing, x->onl->Incoming, x->onl->Mode, x->onl->Session);
 			system(buf);
 		} else {
-			sprintf(buf, "/vpnserver/cmd/update2.sh %s %ld %ld %d", x->name, x->SendBroad+x->SendUni, x->RecvUni+x->RecvBroad, x->online);
+			sprintf(buf, "/vpnserver/cmd/update2.sh %s %ld %ld %d %d %d %d %d", x->name, x->SendBroad+x->SendUni, x->RecvUni+x->RecvBroad, x->online, x->upload, x->down, x->logins, x->access);
 			system(buf);
 		}
 		x=x->next;
@@ -223,16 +223,20 @@ void  monitor(user *u) {
 	user *x;
 	x=u;
 	int m,n;
-	char buf[30];
+	char buf[50];
 	while(x!=NULL){
 		m=x->Count;
 		n=x->Count2;
-		if(m>n&&x->access==1) {
+		if(m>n) {
+			if(x->access==1) {
 			sprintf(buf, "/vpnserver/cmd/Access.sh %s %s", x->name, "no");
 			system(buf);
-			sprintf(buf, "/vpnserver/cmd/SessionDisconnect.sh %s", x->onl->Session);
-			system(buf);
 			x->access=0;
+			}
+			if(x->online > 0) {
+				sprintf(buf, "/vpnserver/cmd/SessionDisconnect.sh %s", x->onl->Session);
+				system(buf);
+			}
 		}
 		if(m<n&&x->access==0) {
 			sprintf(buf, "/vpnserver/cmd/Access.sh %s %s", x->name, "yes");
@@ -259,14 +263,23 @@ void freelist(user *u) {
 	}
 }
 
-void oli(user *u) {
+void oli(user *u, ol *o) {
 	user *a;
+	ol *b;
+	char buf[50];
 	a=u;
 	while(a!=NULL) {
-		if(a->onl==NULL) 
-			a->online=0;
-		else
-			a->online=1;
+		b=o;
+		if(a->online > a->logins && a->logins!=0) {
+			while(b!=NULL) {
+				if(strcmp(b->name,a->name)==0 && a->online > a->logins) {
+					sprintf(buf, "/vpnserver/cmd/SessionDisconnect.sh %s", b->Session);
+					system(buf);
+					a->online--;
+				}
+				b=b->next;
+			}
+		}
 		a=a->next;
 	}
 }
@@ -363,10 +376,12 @@ void onlines(user *u) {
 		while(us!=NULL&&m==0) {
 			if(strcmp(c->name, us->name)==0) {
 				us->onl=c;
+				us->online++;
 				m++;
 				break;
 			}
 			us=us->next;
 		}
 	}
+	oli(u,a->next);
 }
