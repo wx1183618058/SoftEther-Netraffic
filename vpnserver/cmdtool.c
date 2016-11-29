@@ -175,7 +175,6 @@ user * usersSet() {
 	free(c);
 	b->next=NULL;
 	getCount(a);
-	onlines(a);
 	return a;
 }
 
@@ -247,13 +246,12 @@ void  monitor(user *u) {
 	}
 }
 
-void freelist(user *u) {
+void freelist(user *u, ol *o) {
 	user *m;
-	ol *n,*a;
-	n=u->onl;
-	while(n!=NULL) {
-		a=n;
-		n=n->next;
+	ol *a;
+	while(o!=NULL) {
+		a=o;
+		o=o->next;
 		free(a);
 	}
 	while(u!=NULL) {
@@ -296,7 +294,7 @@ int zero() {
 	}
 }
 
-void onlines(user *u) {
+ol * onlines(user *u) {
 	int m=0;
 	char buff[200];
 	char *s="SID-";
@@ -383,5 +381,5 @@ void onlines(user *u) {
 			us=us->next;
 		}
 	}
-	oli(u,a->next);
+	return a;
 }
