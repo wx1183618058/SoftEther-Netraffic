@@ -59,7 +59,7 @@ void getCount(user *);
 void  monitor(user *);
 
 //释放数据库
-void freelist(user *);
+void freelist(user *, ol *);
 
 //提出多于用户
 void oli(user *,  ol *);
@@ -68,4 +68,4 @@ void oli(user *,  ol *);
 int zero();
 
 //线添加在线信息
-void onlines(user *);
+ol * onlines(user *);
