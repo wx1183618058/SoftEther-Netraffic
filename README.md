@@ -7,3 +7,9 @@
 
 ###使用方法
 > 先将cmdtool在服务器上编译，在再根目录下安装 SoftEther然后把对应文件复制进/vpnserver，接着运行cmdtool即可。
+
+###添加负载功能
+> Server下的是主服务器 Clinet是成员服务器，编译好后对应放入即可
+> /Client/Serverlist 是主服务器IP列表，clinet连接时需要
+> /Server/load/ClinetList 是成员服务器IP列表，server判断是否规定ip
+> WEB端需要用负载专用版

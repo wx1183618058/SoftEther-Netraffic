@@ -1,0 +1,489 @@
+﻿#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <sys/param.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include "cmdtool.h"
+#include "cmdother.h"
+
+void logs(user *u) {
+	user *us;
+	us=u;
+	while(us!=NULL) {
+		printf("%s %ld %ld %d %ld\n", us->name, us->SendBroad+us->SendUni, us->RecvUni+us->RecvBroad, us->online, us->onl->Outgoing);
+		us=us->next;
+	}
+}
+
+void fromSet(){
+	char *s1="declare UserList";
+	char *s2="declare Policy";
+	char *s3="declare Traffic";
+	char *s4="declare RecvTraffic";
+	char *s5="declare SendTraffic";
+	char *s6="declare VirtualLayer3SwitchList";
+	FILE *fp1, *fp2, *fp3;
+	char ch;
+	int i,a=0,n,flag;
+	char buff[200];
+	fp2=fopen(config"2","w");
+	if((fp1=fopen(config,"r")) != NULL)
+	{
+		while((ch=fgetc(fp1))!=EOF ) {
+			if(ch!='	' && ch!='{' && ch!='}') {
+				fputc(ch,fp2);
+			}
+		}
+	}
+	fclose(fp1);
+    fclose(fp2);
+	fp2=fopen(config"2","r");
+	fp3=fopen(config"3","w");
+	while (fgets(&buff[0],199,fp2) !=NULL) {
+		if(a==1) {
+			if(strstr(buff,s2)||strstr(buff,s3)||strstr(buff,s4)||strstr(buff,s5)||strstr(buff,s6))
+			{
+				int len=strlen(buff);
+				int x;
+				for(x=0; x<len; x++)
+					buff[x]=' ';
+			}
+			n = strlen(buff);
+			flag = 0;
+			if(n>1) for (i=0;i<n-1;i++)
+				if (buff[i] != ' ')
+					flag=1;
+			if(n!=1 && flag==1)
+					fprintf(fp3,"%s",buff);
+		}
+		if(strstr(buff, s1)!=0) a=1;
+}
+
+    fclose(fp2);
+	fclose(fp3);
+	remove(config"2");
+}
+
+user * usersSet() {
+	int m=0;
+	char buff[200];
+	char *s0="declare ";
+	char *s1="uint64 ExpireTime ";
+	char *s2="bool Access ";
+	char *s3="uint MaxDownload ";
+	char *s4="uint MaxUpload ";
+	char *s5="uint MultiLogins ";
+	char *s6="uint64 BroadcastBytes ";
+	char *s7="uint64 UnicastBytes ";
+	char *s8="uint64 BroadcastBytes ";
+	char *s9="uint64 UnicastBytes ";
+	FILE *fp;
+	user *a;
+	user *c;
+	user *b;
+	ol *h;
+	a=(user *)malloc(sizeof(user));
+	c=a;
+	c->next=NULL;
+	fp=fopen(config"3","r");
+	while (fgets(&buff[0],199,fp)!=NULL) {
+		if(strstr(buff, s0)==0||m!=0) {
+			if(strstr(buff, s1)==0||m!=1) {
+				if(strstr(buff, s2)==0||m!=2) {
+					if(strstr(buff, s3)==0||m!=3) {
+						if(strstr(buff, s4)==0||m!=4) {
+							if(strstr(buff, s5)==0||m!=5) {
+								if(strstr(buff, s6)==0||m!=6) {
+									if(strstr(buff, s7)==0||m!=7) {
+										if(strstr(buff, s8)==0||m!=8) {
+											if(strstr(buff, s9)==0||m!=9) {
+												if(m==10) {
+													c->Count=(c->RecvUni+c->RecvBroad+c->SendUni+c->SendBroad)/1024/1024;
+													c->Count3=c->RecvUni+c->RecvBroad+c->SendUni+c->SendBroad;
+													c->Count2=0;
+													c->online=0;
+													h=(ol *)malloc(sizeof(ol));
+													c->onl=h;
+													c->onl->n=0;
+													c->onl->Transfer=0;
+													c->onl->Outgoing=0;
+													c->onl->Incoming=0;
+													c->onl->next=NULL;
+													c->next=(user *)malloc(sizeof(user));
+													b=c;
+													c=c->next;
+													c->next=NULL;
+													m=0;
+												}
+											}else{
+												int x=strlen(s9);
+                                                c->RecvUni=cton(buff+x);
+												m++;
+											}
+										}else{
+											int x=strlen(s8);
+                                            c->RecvBroad=cton(buff+x);
+											m++;
+										}
+									}else{
+                                        int x=strlen(s7);
+                                        c->SendUni=cton(buff+x);
+										m++;
+									}
+								}else{
+									int x=strlen(s6);
+									c->SendBroad=cton(buff+x);
+									m++;
+								}
+							}else{
+								int x=strlen(s5);
+								int n=atoi(buff+x);
+								c->logins=n;
+								m++;
+							}
+						}else{
+							int x=strlen(s4);
+							int n=atoi(buff+x);
+							c->upload=n;
+							m++;
+							}
+					}else{
+						int x=strlen(s3);
+						int n=atoi(buff+x);
+						c->down=n;
+						m++;
+					}
+				} else {
+					int x=strlen(s2);
+					int n=strlen(buff);
+					buff[n-2]='\0';
+					if(strcmp(buff+x, "true")==0) {
+						c->access=1;
+					}else {
+						c->access=0;
+					}
+					m++;
+				}
+			} else {
+				int x=strlen(s1);
+                c->time=cton(buff+x);
+				m++;
+			}
+		} else {
+			int x=strlen(s0);
+			int n=strlen(buff);
+			buff[n-2]='\0';
+			strcpy(c->name, buff+x);
+			m++;
+		}
+	}
+	free(c);
+	b->next=NULL;
+	getCount(a);
+	return a;
+}
+
+void file(user *u) {
+	user *x;
+	FILE *fp;
+	char buf[200];
+	x=u;
+	fp=fopen(SERVER, "w");
+	while(x!=NULL) {
+		if(x->online!=0) {
+			sprintf(buf, "/vpnserver/cmd/update.sh %s %ld %ld %d %ld %ld %s %s", x->name, x->SendBroad+x->SendUni, x->RecvUni+x->RecvBroad, x->online, x->onl->Outgoing, x->onl->Incoming, x->onl->Mode, x->onl->Session);
+			fprintf(fp, "NA:%s SB:%ld SU:%ld RU:%ld RB:%ld ON:%d SE:%s OUT:%ld IN:%ld MO:%s \n", x->name, x->SendBroad, x->SendUni, x->RecvUni, x->RecvBroad, x->online, x->onl->Session, x->onl->Outgoing, x->onl->Incoming, x->onl->Mode);
+			system(buf);
+		} else {
+			sprintf(buf, "/vpnserver/cmd/update2.sh %s %ld %ld %d %d %d %d %d", x->name, x->SendBroad+x->SendUni, x->RecvUni+x->RecvBroad, x->online, x->upload, x->down, x->logins, x->access);
+			fprintf(fp, "NA:%s SB:%ld SU:%ld RU:%ld RB:%ld ON:%d SE:%d OUT:%d IN:%d MO:%d \n", x->name, x->SendBroad, x->SendUni, x->RecvUni, x->RecvBroad, 0, 0, 0, 0, 0);
+			system(buf);
+		}
+		x=x->next;
+	}
+	fclose(fp);
+}
+
+
+
+void getCount(user *u) {
+	FILE *fp;
+	user *x;
+	x=u;
+	int m=0;
+	char buf[20];
+	char buff[30];
+	fp=fopen(count,"r");
+	while(x!=NULL) {
+		while(fgets(&buff[0],29,fp)!=NULL&&m==0) {
+				if(strstr(buff, x->name)!=0) {
+					x->Count2=atoi(buff+strlen(x->name));
+					m=1;
+				}
+		}
+		x=x->next;
+		m=0;
+		fseek(fp,0,SEEK_SET);
+	}
+	fclose(fp);
+}
+
+void  monitor(user *u) {
+	user *x;
+	x=u;
+	int m,n;
+	char buf[50];
+	while(x!=NULL){
+		m=x->Count;
+		n=x->Count2;
+		if(m>n) {
+			if(x->access==1) {
+			sprintf(buf, "/vpnserver/cmd/Access.sh %s %s", x->name, "no");
+			system(buf);
+			x->access=0;
+			}
+			if(x->online > 0 && x->onl->n == 1) {
+				sprintf(buf, "/vpnserver/cmd/SessionDisconnect.sh %s", x->onl->Session);
+				system(buf);
+			}
+		}
+		if(m<n&&x->access==0) {
+			sprintf(buf, "/vpnserver/cmd/Access.sh %s %s", x->name, "yes");
+			system(buf);
+			x->access=1;
+		}
+		x=x->next;
+	}
+}
+
+void freelist(user *u, ol *o) {
+	user *m;
+	ol *a;
+	while(o!=NULL) {
+		a=o;
+		o=o->next;
+		free(a);
+	}
+	while(u!=NULL) {
+		m=u;
+		u=u->next;
+		free(m->onl);
+		free(m);
+	}
+}
+
+void oli(user *u, ol *o) {
+	user *a;
+	ol *b;
+	char buf[50];
+	a=u;
+	while(a!=NULL) {
+		b=o;
+		if(a->online > a->logins && a->logins!=0 && a->onl->n == 1) {
+			while(b!=NULL) {
+				if(strcmp(b->name,a->name)==0 && a->online > a->logins) {
+					sprintf(buf, "/vpnserver/cmd/SessionDisconnect.sh %s", b->Session);
+					system(buf);
+					a->online--;
+				}
+				b=b->next;
+			}
+		}
+		a=a->next;
+	}
+}
+
+int zero() {
+	FILE *fp;
+	fp=fopen(count, "r");
+	if(getc(fp)==EOF) {
+		fclose(fp);
+		return 0;
+	} else {
+		fclose(fp);
+		return 1;
+	}
+}
+
+ol * onlines(user *u) {
+	int m=0;
+	char buff[200];
+	char *s="SID-";
+	char *s2="Client IP Address                         |";
+	char *s3="User Name (Authentication)                |";
+	char *s4="Outgoing Data Size                        |";
+	char *s5="Incoming Data Size                        |";
+	char *s6="127.0.0.1";
+	char *p;
+	user *us;
+	ol *a;
+	ol *b;
+	ol *c;
+	FILE *fp;
+	a=(ol *)malloc(sizeof(ol));
+	b=a;
+	b->next=NULL;
+	sprintf(buff, "/vpnserver/cmd/SessionList.sh >> "oline);
+	system(buff);
+	fp=fopen(oline, "r");
+	while(fgets(&buff[0],199,fp)!=NULL) {
+		if((p=strstr(buff, s))!=0) {
+			(p+strlen(p)-1)[0]='\0';
+			strcpy(b->Session, p);
+			b->next=(ol *)malloc(sizeof(ol));
+			c=b;
+			b=b->next;
+		}
+	}
+	free(b);
+	c->next=NULL;
+	fclose(fp);
+	remove(oline);	
+	c=a;
+	while((c=c->next)!=NULL) {
+		sprintf(buff, "/vpnserver/cmd/SessionGet.sh %s >> "oline2, c->Session);
+		system(buff);
+		fp=fopen(oline2, "r");
+		m=0;
+		while(fgets(&buff[0],199,fp)!=NULL) {
+			if(m==0&&(p=strstr(buff, s2))!=0) {
+				(p+strlen(p)-1)[0]='\0';
+				if(strstr(p, s6)!=0) {
+					strcpy(c->Mode, "TCP");
+					m++;
+				}
+				else
+				{
+					strcpy(c->Mode, "UDP");
+					m++;
+				}
+			}
+			if(m==1&&(p=strstr(buff, s3))!=0) {
+				(p+strlen(p)-1)[0]='\0';
+				strcpy(c->name, p+strlen(s3));
+				m++;
+			}
+			if(m==2&&(p=strstr(buff, s4))!=0) {
+				(p+strlen(p)-1)[0]='\0';
+				c->Outgoing=cton(p+strlen(s4));
+				m++;
+			}
+			if(m==3&&(p=strstr(buff, s5))!=0) {
+				(p+strlen(p)-1)[0]='\0';
+				c->Incoming=cton(p+strlen(s5));
+				c->Transfer=c->Outgoing+c->Incoming;
+				m++;				
+			}
+		}
+		fclose(fp);
+		remove(oline2);
+	}
+	c=a;
+	while((c=c->next)!=NULL) {
+		us=u;
+		m=0;
+		while(us!=NULL&&m==0) {
+			if(strcmp(c->name, us->name)==0) {
+				strcpy(us->onl->Session, c->Session);
+				strcpy(us->onl->name, c->Session);
+				us->onl->Transfer=c->Transfer;
+				us->onl->Outgoing=c->Outgoing;
+				us->onl->Incoming=c->Incoming;
+				strcpy(us->onl->Mode, c->Mode);
+				us->onl->n=1;
+				us->online++;
+				m++;
+				break;
+			}
+			us=us->next;
+		}
+	}
+	return a;
+}
+
+void getSum(user *u) {
+	int n,onlines;
+	user *a;
+	uint64_t send, recv;
+	FILE *fp1, *fp2;
+	uint64_t out,in;
+	char buffer[20], bload[30];
+	char *buff;
+	char buf[1024], *tmp;
+	char *s1="NA:", *s2="SB:", *s3="SU:", *s4="RU:", *s5="RB:", *s6="ON:", *s7="SE:", *s8="OUT:", *s9="IN:", *s10="MO:";
+	fp1=fopen(LIST, "r");
+	buff=(char *)malloc(sizeof(char)*200);
+	
+	while(fgets(buffer, 19, fp1) != NULL) {
+		onlines=0;
+		out=0;
+		in=0;
+		buffer[strlen(buffer)-1] = '\0';
+		sprintf(bload, LOAD"%s", buffer);
+		if((fp2=fopen(bload, "r")) == NULL) {
+			continue;
+		}
+		while(fgets(buf, 1023, fp2) != NULL) {
+			a=u;
+			n=0;
+			buff=getchars(buff, buf, s1, ' ' );
+			while(a!=NULL&&n==0) {
+				if( strcmp(a->name, buff) == 0 ) {
+					
+					n++;
+					buff=getchars(buff, buf, s2, ' ' );
+					a->SendBroad=a->SendBroad+cton(buff);
+					send=cton(buff);
+					
+					buff=getchars(buff, buf, s3, ' ' );
+					a->SendUni=a->SendUni+cton(buff);
+					send=send+cton(buff);
+					
+					buff=getchars(buff, buf, s4, ' ' );
+					a->RecvUni=a->RecvUni+cton(buff);
+					recv=cton(buff);
+					
+					buff=getchars(buff, buf, s5, ' ' );
+					a->RecvBroad=a->RecvBroad+cton(buff);
+					recv=recv+cton(buff);
+					
+					a->Count=(a->RecvUni+a->RecvBroad+a->SendUni+a->SendBroad)/1024/1024;
+					a->Count3=a->RecvUni+a->RecvBroad+a->SendUni+a->SendBroad;
+					
+					buff=getchars(buff, buf, s6, ' ' );
+					if(cton(buff) == 0) {
+						out=out+send;
+						in=in+recv;
+						break;
+					}
+					a->online=a->online+cton(buff);
+					out=out+send;
+					in=in+recv;
+					onlines=onlines+cton(buff);
+					
+					if(a->onl->n == 0) {
+					buff=getchars(buff, buf, s7, ' ' );
+					strcpy(a->onl->Session, buff);
+					}
+					
+					buff=getchars(buff, buf, s8, ' ' );
+					a->onl->Outgoing=a->onl->Outgoing+cton(buff);
+
+					buff=getchars(buff, buf, s9, ' ' );
+					a->onl->Incoming=a->onl->Incoming+cton(buff);
+
+					buff=getchars(buff, buf, s10, ' ' );
+					strcpy(a->onl->Mode, buff);
+				}
+				
+				a=a->next;
+			}
+		}
+		sprintf(buff, "/vpnserver/cmd/server.sh %s %ld %ld %d", buffer, out, in, onlines);
+		system(buff);
+	}
+	
+	free(buff);
+}
