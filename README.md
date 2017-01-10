@@ -1,15 +1,21 @@
 # SoftEther-Netraffic
 **本软件**是一款SoftEther的第三方流量监控 
+
 - 使用本软件适用于使用SoftEther的服务器。
-- 核心是C语言编写其他SHELL脚本测试环境网易centos6.7(理论上其他通用)
-- old为旧版流控支持旧版BLG和JY WEB端
-- 新版只支持新BLG WEB
+
+- 核心是C语言编写
 
 ###使用方法
-> 先将cmdtool在服务器上编译，在再根目录下安装 SoftEther然后把对应文件复制进/vpnserver，接着运行cmdtool即可。
 
-###添加负载功能
-> Server下的是主服务器 Clinet是成员服务器，编译好后对应放入即可
-> /Client/Serverlist 是主服务器IP列表，clinet连接时需要
-> /Server/load/ClinetList 是成员服务器IP列表，server判断是否规定ip
-> WEB端需要用负载专用版
+ 1. 在根目录下安装 SoftEther
+ 
+ 2. 先将vpntool在服务器上编译在vpntool.h中改好对应目录 ,编译代码如下,部分需要修改
+```
+gcc -g vpntool.c vpncmd.c vpnother.c vpnsql.c vpnmt.c -L/usr/local/mysql/lib -lmysqlclient
+```
+3.把编译好的文件和vpnconfig文件夹,vpntool.ini复制到SoftEther目录中，在创建user_pass.config文件
+4.在修改vpntool.ini中的配置，监控时间推荐5s，如果两台服务器就10s以此类推
+5.安装对应流控，运行即可
+
+###负载功能
+> 服务器安装好后，运行在前端能看见，服务器ip对接成功
