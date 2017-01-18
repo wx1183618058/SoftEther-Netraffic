@@ -53,3 +53,14 @@ void logs(User_Config *list, User_Pass *pass)
         b=b->next;
     }
 }
+
+void dbug(char *log){
+	FILE *fp;
+	fp=fopen(Dbug_path,"a");
+	if(fp==NULL) {
+		printf("请检查vpntool.log是否被占用\n");
+		exit(-10);
+	}
+	fputs(log,fp);
+	fclose(fp);
+}

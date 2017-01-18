@@ -5,15 +5,16 @@
 #include "/usr/local/mysql/include/mysql.h"
 
 
-#define VPN_INI "/home/weixiao/桌面/vpn/vpntool.ini"
-#define Vpncmd_path "/home/weixiao/桌面/vpnserver/"
-#define Save "/home/weixiao/桌面/vpnserver/vpnconfig/"
-#define SessionGet_path "/home/weixiao/桌面/vpnserver/vpnconfig/SessionGet.config"
-#define UserGet_path "/home/weixiao/桌面/vpnserver/vpnconfig/UserGet.config"
-#define SessionList_path "/home/weixiao/桌面/vpnserver/vpnconfig/SessionList.config"
-#define v_s_path2 "/home/weixiao/桌面/vpnserver/vpnconfig/vpn_server.config"
-#define v_s_path1 "/home/weixiao/桌面/vpnserver/vpn_server.config"
-#define Pass_path "/home/weixiao/桌面/vpnserver/user_pass.config"
+#define VPN_INI "/vpnserver/vpntool.ini"
+#define Vpncmd_path "/vpnserver/"
+#define Save "/vpnserver/vpnconfig/"
+#define SessionGet_path "/vpnserver/vpnconfig/SessionGet.config"
+#define UserGet_path "/vpnserver/vpnconfig/UserGet.config"
+#define SessionList_path "/vpnserver/vpnconfig/SessionList.config"
+#define v_s_path2 "/vpnserver/vpnconfig/vpn_server.config"
+#define v_s_path1 "/vpnserver/vpn_server.config"
+#define Pass_path "/vpnserver/user_pass.config"
+#define Dbug_path "/vpnserver/vpntool.log"
 #define LINE 15
 #define C 9
 

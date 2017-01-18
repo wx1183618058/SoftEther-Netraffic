@@ -14,6 +14,7 @@ void mysqlconnect()
                             C_Vpntool.Msuser, C_Vpntool.Mspass, C_Vpntool.Msdb, C_Vpntool.Msport, NULL, 0))
     {
         fprintf(stderr, "'%s'\n", mysql_error(mysql));
+		dbug("无法连接mysql\n");
         exit(1);
     }
     sprintf(buffer,"select * from server where ip='%s'", C_Vpntool.Ip);
@@ -137,6 +138,13 @@ User_Pass * mysql_get_snyc()
     sprintf(buffer,"select * from openvpn");
     if (mysql_query(mysql, buffer)) exit(1);
     res = mysql_store_result(mysql);
+	if(res->row_count == 0){
+		mysql_free_result(res);
+		free(a);
+        a = NULL;
+        b=NULL;
+        return NULL;
+	}
     while ((row = mysql_fetch_row(res)) != NULL)
     {
         strcpy(b->name, row[1]);
@@ -153,20 +161,10 @@ User_Pass * mysql_get_snyc()
         b->front=a;
         b=a;
     }
-    if (a->next == NULL)
-    {
-        free(a);
-        a = NULL;
-        b=NULL;
-        return NULL;
-    }
-    else
-    {
-        a=a->next;
-        a->front=NULL;
-        free(b);
-        b = NULL;
-    }
+    a=a->next;
+    a->front=NULL;
+    free(b);
+    b = NULL;
     mysql_free_result(res);
     return a;
 }

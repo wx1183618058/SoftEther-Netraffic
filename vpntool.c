@@ -12,19 +12,21 @@ char buffer[BUFFER];
 
 int main()
 {
-    	User_Config *user, *b;
+    User_Config *user, *b;
 	User_Pass *pass;
-    	Get_INI();
+    Get_INI();
 	mysqlconnect();
 	daemon(1,1);
 	while(1) {
 		sleep(C_Vpntool.Cycle);
-		pass=Get_Ass();
+		
    		user=U_olConfigGet();
 		mysql_user(user);
+		
+		pass=Get_Ass();
 		pass=mysql_snyc(pass);
 		//logs(user, pass);
-    		freelist(user, pass);
+    	freelist(user, pass);
 	}
 	mysql_close(mysql);
    	mysql_library_end();
